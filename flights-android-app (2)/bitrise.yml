@@ -1,0 +1,21 @@
+format_version: '13'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: android
+workflows:
+  primary:
+    steps:
+    - git-clone@8: {}
+    - script@1:
+        title: Build debug APK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            curl -sL https://services.gradle.org/distributions/gradle-8.7-bin.zip -o /tmp/g.zip
+            unzip -q /tmp/g.zip -d /tmp
+            /tmp/gradle-8.7/bin/gradle assembleDebug --no-daemon
+            mkdir -p "$BITRISE_DEPLOY_DIR"
+            cp app/build/outputs/apk/debug/app-debug.apk "$BITRISE_DEPLOY_DIR/flights.apk"
+    - deploy-to-bitrise-io@2: {}
+app:
+  envs: []
